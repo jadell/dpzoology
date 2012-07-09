@@ -69,15 +69,28 @@ class Lion extends Animal
 {
 	public function __construct($name)
 	{
-		parent::__construct($name, 'lion', new Run(), new Roar(), new Carnivore($this), new LionDescriptor($this));
+		parent::__construct($name, 'lion', new Run(), new Roar(), new Carnivore($this),
+			new TailDescriptor(
+			new SharpTeethDescriptor(
+			new ManeDescriptor(
+			new QuadrapedDescriptor(
+			new BaseDescriptor($this)
+			)))));
 	}
 }
+
 
 class Chimp extends Animal
 {
 	public function __construct($name)
 	{
-		parent::__construct($name, 'chimp', new Climb(), new Ook(), new Omnivore($this), new ChimpDescriptor($this));
+		parent::__construct($name, 'chimp', new Climb(), new Ook(), new Omnivore($this),
+			new FlatTeethDescriptor(
+			new SharpTeethDescriptor(
+			new ArmsDescriptor(
+			new BipedDescriptor(
+			new BaseDescriptor($this)
+			)))));
 	}
 }
 
@@ -85,7 +98,13 @@ class Gazelle extends Animal
 {
 	public function __construct($name)
 	{
-		parent::__construct($name, 'gazelle', new Run(), new Bleat(), new Herbivore($this), new GazelleDescriptor($this));
+		parent::__construct($name, 'gazelle', new Run(), new Bleat(), new Herbivore($this),
+			new TailDescriptor(
+			new FlatTeethDescriptor(
+			new HornsDescriptor(
+			new QuadrapedDescriptor(
+			new BaseDescriptor($this)
+			)))));
 	}
 }
 
@@ -93,7 +112,25 @@ class Owl extends Animal
 {
 	public function __construct($name)
 	{
-		parent::__construct($name, 'owl', new Fly(), new Hoot(), new Carnivore($this), new OwlDescriptor($this));
+		parent::__construct($name, 'owl', new Fly(), new Hoot(), new Carnivore($this),
+			new BeakDescriptor(
+			new WingsDescriptor(
+			new BipedDescriptor(
+			new BaseDescriptor($this)
+			))));
+	}
+}
+
+class Hipster extends Animal
+{
+	public function __construct($name)
+	{
+		parent::__construct($name, 'hipster', new Fixie(), new SelfRighteous(), new Locavore($this),
+			new VintageDescriptor(
+			new ArmsDescriptor(
+			new BipedDescriptor(
+			new BaseDescriptor($this)
+			))));
 	}
 }
 
@@ -127,6 +164,14 @@ class Fly implements Movement
 	public function move(Animal $animal)
 	{
 		echo $animal->getName() . " flies!\n";
+	}
+}
+
+class Fixie implements Movement
+{
+	public function move(Animal $animal)
+	{
+		echo $animal->getName() . " rides his fixie!\n";
 	}
 }
 
@@ -168,6 +213,14 @@ class Ook implements Voice
 	public function speak(Animal $animal)
 	{
 		echo $animal->getName() . " ook-ooks!\n";
+	}
+}
+
+class SelfRighteous implements Voice
+{
+	public function speak(Animal $animal)
+	{
+		echo $animal->getName() . " says \"You've probably never heard of them.\"\n";
 	}
 }
 
@@ -247,14 +300,32 @@ class Omnivore implements Diet
 	}
 }
 
+class Locavore implements Diet
+{
+	protected $animal;
+	public function __construct(Animal $animal)
+	{
+		$this->animal = $animal;
+	}
+
+	public function eat(Food $food)
+	{
+		echo $this->animal->getName() . " only eats locally-sourced organic free-range cruelty-free paleo tofu and PBR.\n";
+		return false;
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // DESCRIBE /////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-abstract class Descriptor
+interface Descriptor
 {
-	protected $description = 'UNDEFINED';
+	public function describe();
+}
 
+class BaseDescriptor implements Descriptor
+{
 	protected $animal;
 	public function __construct(Animal $animal)
 	{
@@ -273,29 +344,105 @@ abstract class Descriptor
 		}
 		$description .= $species;
 		$description .= ' [' . strtolower(get_class($diet)) . ']';
-		$description .= ' ' . $this->description;
 		return $description;
 	}
 }
 
-class LionDescriptor extends Descriptor
+abstract class ExtendedDescriptor implements Descriptor
 {
-	protected $description = ', 4 legs, a shaggy mane, sharp teeth, a tail';
+	protected $descriptor;
+	public function __construct(Descriptor $descriptor)
+	{
+		$this->descriptor = $descriptor;
+	}
 }
 
-class OwlDescriptor extends Descriptor
+class QuadrapedDescriptor extends ExtendedDescriptor
 {
-	protected $description = ', 2 legs, 2 wings, a beak';
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', 4 legs';
+	}
 }
 
-class GazelleDescriptor extends Descriptor
+class BipedDescriptor extends ExtendedDescriptor
 {
-	protected $description = ', 4 legs, horns, flat teeth, a tail';
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', 2 legs';
+	}
 }
 
-class ChimpDescriptor extends Descriptor
+class ManeDescriptor extends ExtendedDescriptor
 {
-	protected $description = ', 2 legs, 2 arms, sharp teeth, flat teeth';
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', a shaggy mane';
+	}
+}
+
+class SharpTeethDescriptor extends ExtendedDescriptor
+{
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', sharp teeth';
+	}
+}
+
+class TailDescriptor extends ExtendedDescriptor
+{
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', a tail';
+	}
+}
+
+class ArmsDescriptor extends ExtendedDescriptor
+{
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', 2 arms';
+	}
+}
+
+class FlatTeethDescriptor extends ExtendedDescriptor
+{
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', flat teeth';
+	}
+}
+
+class HornsDescriptor extends ExtendedDescriptor
+{
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', horns';
+	}
+}
+
+class WingsDescriptor extends ExtendedDescriptor
+{
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', 2 wings';
+	}
+}
+
+class BeakDescriptor extends ExtendedDescriptor
+{
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', a beak';
+	}
+}
+
+class VintageDescriptor extends ExtendedDescriptor
+{
+	public function describe()
+	{
+		return $this->descriptor->describe() . ', vintage t-shirt, $400 pre-ripped jeans, feelings of self-righteous entitlement';
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -337,6 +484,7 @@ $zoo->addAnimal(new Lion('Rex'));
 $zoo->addAnimal(new Owl('Hooter'));
 $zoo->addAnimal(new Gazelle('Bounder'));
 $zoo->addAnimal(new Chimp('Bobo'));
+$zoo->addAnimal(new Hipster('Jean'));
 
 $zoo->listAnimals();
 echo "\n";
@@ -353,5 +501,11 @@ echo "\n";
 $zoo->getAnimal('Bounder')->eat(new Plant());
 echo "\n";
 
+$zoo->getAnimal('Jean')->eat(new Plant());
+echo "\n";
+
 $zoo->getAnimal('Rex')->speak();
+echo "\n";
+
+$zoo->getAnimal('Jean')->speak();
 echo "\n";
