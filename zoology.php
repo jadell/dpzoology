@@ -14,8 +14,6 @@ $zoo->addAnimal(new Chimp('Bobo'));
 $zoo->addAnimal(new Hipster('Jean'));
 
 $foodStock = new FoodStock();
-$dietMonitor = new DietMonitor();
-$exerciseMonitor = new ExerciseMonitor();
 
 while (true) {
 	$readCommand = strtolower(trim(readline('> ')));
@@ -32,8 +30,6 @@ while (true) {
 		echo <<<HELP
 Available commands:
 	list animals
-	list diets
-	list exercise
 	list stock
 	stock (plant|meat)
 	feed <animalName> (plant|meat)
@@ -52,16 +48,6 @@ HELP;
 	} else if ($command[0] == 'list animals') {
 		$handled = true;
 		$zoo->listAnimals();
-
-	// list diets
-	} else if ($command[0] == 'list diets') {
-		$handled = true;
-		$dietMonitor->listDiets();
-
-	// list exercise
-	} else if ($command[0] == 'list exercise') {
-		$handled = true;
-		$exerciseMonitor->listExercise();
 
 	// list stock
 	} else if ($command[0] == 'list stock') {
