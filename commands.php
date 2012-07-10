@@ -107,10 +107,12 @@ class FeedAnimalHandler extends CommandHandler
 {
 	protected $zoo;
 	protected $stock;
-	public function __construct(Zoo $zoo, FoodStock $stock)
+	protected $events;
+	public function __construct(Zoo $zoo, FoodStock $stock, EventHandler $events)
 	{
 		$this->zoo = $zoo;
 		$this->stock = $stock;
+		$this->events = $events;
 	}
 
 	public function handled($command)
@@ -139,7 +141,9 @@ class FeedAnimalHandler extends CommandHandler
 			return true;
 		}
 
-		$animal->eat($food);
+		if ($animal->eat($food)) {
+			$this->events->dispatch('gaveFood', $animal, $food);
+		}
 		return true;
 	}
 }
@@ -147,9 +151,11 @@ class FeedAnimalHandler extends CommandHandler
 class ExerciseAnimalHandler extends CommandHandler
 {
 	protected $zoo;
-	public function __construct(Zoo $zoo)
+	protected $events;
+	public function __construct(Zoo $zoo, EventHandler $events)
 	{
 		$this->zoo = $zoo;
+		$this->events = $events;
 	}
 
 	public function handled($command)
@@ -165,6 +171,7 @@ class ExerciseAnimalHandler extends CommandHandler
 		}
 
 		$animal->move();
+		$this->events->dispatch('gaveExercise', $animal);
 		return true;
 	}
 }
@@ -292,3 +299,34 @@ class KeyboardInput
 		}
 	}
 }
+
+//////////////////////////////////////////////////////////////////////
+// EVENTS ///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+class EventHandler
+{
+	protected $listeners = array();
+
+	public function listen($event, $listener)
+	{
+		if (!isset($this->listeners[$event])) {
+			$this->listeners[$event] = array();
+		}
+		$this->listeners[$event][] = $listener;
+	}
+
+	public function dispatch($event)
+	{
+		if (!isset($this->listeners[$event])) {
+			return;
+		}
+
+		$args = func_get_args();
+		array_shift($args);
+		foreach ($this->listeners[$event] as $listener) {
+			call_user_func_array(array($listener, $event), $args);
+		}
+	}
+}
+

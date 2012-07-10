@@ -77,6 +77,19 @@ class ExerciseMonitor
 	}
 }
 
+class KeeperNotification
+{
+	public function gaveFood(Animal $animal, Food $food)
+	{
+		echo "Keeper Notified: " . $animal->getName() . " just ate a " . get_class($food) . "\n";
+	}
+
+	public function gaveExercise(Animal $animal)
+	{
+		echo "Keeper Notified: " . $animal->getName() . " just exercised\n";
+	}
+}
+
 class FoodStock
 {
 	protected $plants = array();
