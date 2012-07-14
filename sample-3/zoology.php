@@ -71,9 +71,9 @@ class Lion extends Animal
 	{
 		parent::__construct($name, 'lion', new Run(), new Roar(), new Carnivore($this),
 			new TailDescriptor(
-			new SharpTeethDescriptor(
+			new TeethDescriptor(TeethDescriptor::SHARP,
 			new ManeDescriptor(
-			new QuadrapedDescriptor(
+			new LimbsDescriptor(4, LimbsDescriptor::LEGS,
 			new BaseDescriptor($this)
 			)))));
 	}
@@ -85,10 +85,10 @@ class Chimp extends Animal
 	public function __construct($name)
 	{
 		parent::__construct($name, 'chimp', new Climb(), new Ook(), new Omnivore($this),
-			new FlatTeethDescriptor(
-			new SharpTeethDescriptor(
-			new ArmsDescriptor(
-			new BipedDescriptor(
+			new TeethDescriptor(TeethDescriptor::FLAT,
+			new TeethDescriptor(TeethDescriptor::SHARP,
+			new LimbsDescriptor(2, LimbsDescriptor::ARMS,
+			new LimbsDescriptor(2, LimbsDescriptor::LEGS,
 			new BaseDescriptor($this)
 			)))));
 	}
@@ -100,9 +100,9 @@ class Gazelle extends Animal
 	{
 		parent::__construct($name, 'gazelle', new Run(), new Bleat(), new Herbivore($this),
 			new TailDescriptor(
-			new FlatTeethDescriptor(
+			new TeethDescriptor(TeethDescriptor::FLAT,
 			new HornsDescriptor(
-			new QuadrapedDescriptor(
+			new LimbsDescriptor(4, LimbsDescriptor::LEGS,
 			new BaseDescriptor($this)
 			)))));
 	}
@@ -113,9 +113,9 @@ class Owl extends Animal
 	public function __construct($name)
 	{
 		parent::__construct($name, 'owl', new Fly(), new Hoot(), new Carnivore($this),
-			new BeakDescriptor(
-			new WingsDescriptor(
-			new BipedDescriptor(
+			new TeethDescriptor(TeethDescriptor::BEAK,
+			new LimbsDescriptor(2, LimbsDescriptor::WINGS,
+			new LimbsDescriptor(2, LimbsDescriptor::LEGS,
 			new BaseDescriptor($this)
 			))));
 	}
@@ -127,8 +127,8 @@ class Hipster extends Animal
 	{
 		parent::__construct($name, 'hipster', new Fixie(), new SelfRighteous(), new Locavore($this),
 			new VintageDescriptor(
-			new ArmsDescriptor(
-			new BipedDescriptor(
+			new LimbsDescriptor(2, LimbsDescriptor::ARMS,
+			new LimbsDescriptor(2, LimbsDescriptor::LEGS,
 			new BaseDescriptor($this)
 			))));
 	}
@@ -357,19 +357,43 @@ abstract class ExtendedDescriptor implements Descriptor
 	}
 }
 
-class QuadrapedDescriptor extends ExtendedDescriptor
+class LimbsDescriptor extends ExtendedDescriptor
 {
+	const ARMS = 'arms';
+	const LEGS = 'legs';
+	const WINGS = 'wings';
+
+	protected $legs;
+	protected $type;
+	public function __construct($legs, $type, Descriptor $descriptor)
+	{
+		$this->legs = (int)$legs;
+		$this->type = (string)$type;
+		parent::__construct($descriptor);
+	}
+
 	public function describe()
 	{
-		return $this->descriptor->describe() . ', 4 legs';
+		return $this->descriptor->describe() . ", {$this->legs} {$this->type}";
 	}
 }
 
-class BipedDescriptor extends ExtendedDescriptor
+class TeethDescriptor extends ExtendedDescriptor
 {
+	const SHARP = 'sharp teeth';
+	const FLAT = 'flat teeth';
+	const BEAK = 'a beak';
+
+	protected $type;
+	public function __construct($type, Descriptor $descriptor)
+	{
+		$this->type = (string)$type;
+		parent::__construct($descriptor);
+	}
+
 	public function describe()
 	{
-		return $this->descriptor->describe() . ', 2 legs';
+		return $this->descriptor->describe() . ", {$this->type}";
 	}
 }
 
@@ -381,14 +405,6 @@ class ManeDescriptor extends ExtendedDescriptor
 	}
 }
 
-class SharpTeethDescriptor extends ExtendedDescriptor
-{
-	public function describe()
-	{
-		return $this->descriptor->describe() . ', sharp teeth';
-	}
-}
-
 class TailDescriptor extends ExtendedDescriptor
 {
 	public function describe()
@@ -397,43 +413,11 @@ class TailDescriptor extends ExtendedDescriptor
 	}
 }
 
-class ArmsDescriptor extends ExtendedDescriptor
-{
-	public function describe()
-	{
-		return $this->descriptor->describe() . ', 2 arms';
-	}
-}
-
-class FlatTeethDescriptor extends ExtendedDescriptor
-{
-	public function describe()
-	{
-		return $this->descriptor->describe() . ', flat teeth';
-	}
-}
-
 class HornsDescriptor extends ExtendedDescriptor
 {
 	public function describe()
 	{
 		return $this->descriptor->describe() . ', horns';
-	}
-}
-
-class WingsDescriptor extends ExtendedDescriptor
-{
-	public function describe()
-	{
-		return $this->descriptor->describe() . ', 2 wings';
-	}
-}
-
-class BeakDescriptor extends ExtendedDescriptor
-{
-	public function describe()
-	{
-		return $this->descriptor->describe() . ', a beak';
 	}
 }
 
